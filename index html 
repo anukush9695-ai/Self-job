@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SelfJob – Apni Job, Apna Future</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+  input,select,textarea{font-family:inherit}
+  button{font-family:inherit;cursor:pointer}
+  #nav{background:linear-gradient(135deg,#1e3a5f,#0f4c81);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 2px 20px #00000055;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:8px}
+  #logo{font-size:22px;font-weight:800;color:#38bdf8;letter-spacing:1px;cursor:pointer}
+  .nav-links{display:flex;gap:6px;flex-wrap:wrap}
+  .nav-btn{background:transparent;color:#94a3b8;border:1.5px solid #334155;padding:6px 14px;border-radius:20px;font-weight:600;font-size:13px;transition:all .2s}
+  .nav-btn.active{background:#38bdf8;color:#0f172a;border-color:#38bdf8}
+  .nav-btn:hover{border-color:#38bdf8;color:#38bdf8}
+  .hero{background:linear-gradient(135deg,#1e3a5f 0%,#0c2340 60%,#1a1a2e 100%);padding:60px 20px 40px;text-align:center}
+  .hero-title{font-size:clamp(26px,5vw,40px);font-weight:900;color:#fff;margin-bottom:10px;line-height:1.2}
+  .hero-sub{color:#94a3b8;font-size:16px;margin-bottom:30px}
+  .search-bar{display:flex;gap:10px;max-width:620px;margin:0 auto 20px;flex-wrap:wrap;justify-content:center}
+  .hero-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .inp{background:#1e293b;border:1.5px solid #334155;color:#e2e8f0;padding:10px 16px;border-radius:10px;font-size:14px;outline:none;flex:1;min-width:200px}
+  .inp:focus{border-color:#38bdf8}
+  .sel{background:#1e293b;border:1.5px solid #334155;color:#e2e8f0;padding:10px 14px;border-radius:10px;font-size:13px;outline:none}
+  .full-inp{width:100%;background:#0f172a;border:1.5px solid #334155;color:#e2e8f0;padding:10px 14px;border-radius:10px;font-size:14px;outline:none}
+  .full-inp:focus{border-color:#38bdf8}
+  .textarea{width:100%;background:#0f172a;border:1.5px solid #334155;color:#e2e8f0;padding:10px 14px;border-radius:10px;font-size:14px;outline:none;min-height:80px;resize:vertical}
+  .btn-blue{background:#38bdf8;color:#0f172a;border:none;padding:10px 22px;border-radius:10px;font-weight:700;font-size:14px}
+  .btn-purple{background:#6366f1;color:#fff;border:none;padding:10px 22px;border-radius:10px;font-weight:700;font-size:14px}
+  .btn-gray{background:#475569;color:#fff;border:none;padding:10px 22px;border-radius:10px;font-weight:700;font-size:14px}
+  .btn-outline{background:transparent;color:#38bdf8;border:1.5px solid #38bdf8;padding:8px 18px;border-radius:10px;font-weight:600;font-size:13px}
+  .btn-red{background:#ef444422;color:#ef4444;border:1px solid #ef444444;padding:6px 14px;border-radius:8px;font-weight:600;font-size:12px}
+  .btn-edit{background:#6366f122;color:#818cf8;border:1px solid #6366f144;padding:6px 14px;border-radius:8px;font-weight:600;font-size:12px}
+  .btn-green{background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;padding:6px 14px;border-radius:8px;font-weight:600;font-size:12px}
+  .btn-full{width:100%;font-size:15px;padding:14px;border-radius:10px;border:none;font-weight:700}
+  .stats-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;padding:20px}
+  .stat-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px 28px;text-align:center;min-width:110px}
+  .stat-num{font-size:28px;font-weight:900;color:#38bdf8}
+  .stat-label{font-size:12px;color:#64748b;margin-top:2px}
+  .section{max-width:1100px;margin:0 auto;padding:20px 16px}
+  .section-title{font-size:20px;font-weight:700;color:#f1f5f9;margin-bottom:16px;border-left:4px solid #38bdf8;padding-left:12px}
+  .job-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .job-card{background:#1e293b;border:1px solid #1e40af33;border-top:3px solid #38bdf8;border-radius:14px;padding:20px;cursor:pointer;transition:transform .15s,box-shadow .15s}
+  .job-card:hover{transform:translateY(-2px);box-shadow:0 6px 24px #00000044}
+  .job-title{font-size:17px;font-weight:700;color:#f1f5f9;margin-bottom:4px}
+  .job-company{color:#38bdf8;font-size:13px;font-weight:600}
+  .job-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+  .tag{font-size:11px;color:#64748b}
+  .badge{display:inline-block;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600;margin-right:4px}
+  .badge-blue{background:#38bdf822;color:#38bdf8;border:1px solid #38bdf855}
+  .badge-green{background:#22c55e22;color:#22c55e;border:1px solid #22c55e55}
+  .badge-yellow{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b55}
+  .badge-purple{background:#6366f122;color:#818cf8;border:1px solid #6366f155}
+  .admin-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .form-group{margin-bottom:14px}
+  .form-label{font-size:12px;color:#94a3b8;font-weight:600;margin-bottom:5px;display:block}
+  .form-row{display:flex;gap:12px;flex-wrap:wrap}
+  .form-row>div{flex:1;min-width:140px}
+  .form-card{background:#1e293b;border-radius:16px;padding:24px;border:1px solid #334155}
+  .success-box{background:#22c55e22;border:1px solid #22c55e;color:#22c55e;padding:12px 16px;border-radius:10px;margin-bottom:16px;font-weight:700}
+  .error-box{color:#ef4444;font-size:13px;margin-bottom:12px;background:#ef444422;padding:10px 14px;border-radius:8px;border:1px solid #ef444444}
+  .modal-overlay{display:none;position:fixed;inset:0;background:#00000088;z-index:1000;align-items:center;justify-content:center;padding:16px}
+  .modal-overlay.open{display:flex}
+  .modal-box{background:#1e293b;border-radius:18px;padding:28px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;border:1px solid #334155}
+  .modal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+  .modal-close{background:none;border:none;color:#64748b;font-size:24px;line-height:1}
+  .tab-btn{background:#1e293b;color:#94a3b8;border:1px solid #334155;padding:8px 18px;border-radius:8px;font-weight:700;font-size:13px}
+  .tab-btn.active{background:#38bdf8;color:#0f172a;border-color:#38bdf8}
+  .admin-row{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:12px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .admin-panel{display:none}.admin-panel.active{display:block}
+  .page{display:none}.page.active{display:block}
+  #toast{position:fixed;bottom:24px;right:24px;background:#22c55e;color:#fff;padding:12px 22px;border-radius:12px;font-weight:700;font-size:14px;z-index:9999;display:none;box-shadow:0 4px 20px #00000055}
+  .filter-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+  .loading{display:flex;align-items:center;justify-content:center;padding:60px;color:#64748b;font-size:15px;gap:12px}
+  .spinner{width:24px;height:24px;border:3px solid #334155;border-top-color:#38bdf8;border-radius:50%;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #sync-status{position:fixed;top:68px;right:12px;font-size:11px;padding:4px 10px;border-radius:20px;z-index:200;font-weight:600}
+  .sync-ok{background:#22c55e22;color:#22c55e;border:1px solid #22c55e44}
+  .sync-saving{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44}
+  .sync-error{background:#ef444422;color:#ef4444;border:1px solid #ef444444}
+  /* Custom fields */
+  .custom-field-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;background:#0f172a;padding:10px;border-radius:8px;border:1px solid #334155}
+  .custom-field-row input{flex:1;background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 10px;border-radius:8px;font-size:13px;outline:none}
+  .custom-field-row select{background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 10px;border-radius:8px;font-size:13px;outline:none}
+  @media(max-width:500px){#nav{height:auto;padding:10px 16px}.hero{padding:40px 16px 28px}.modal-box{padding:18px}}
+</style>
+</head>
+<body>
+
+<div id="sync-status" class="sync-ok">🟢 Live</div>
+
+<nav id="nav">
+  <div id="logo" onclick="showPage('home')">💼 SelfJob</div>
+  <div class="nav-links">
+    <button class="nav-btn active" id="nav-home" onclick="showPage('home')">🏠 Home</button>
+    <button class="nav-btn" id="nav-jobs" onclick="showPage('jobs')">💼 Jobs</button>
+    <button class="nav-btn" id="nav-admin" onclick="showPage('admin')">⚙️ Admin</button>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-title">💼 SelfJob<br><span style="color:#38bdf8">Apni Job, Apna Future</span></div>
+    <div class="hero-sub">Employers vacancy dalo • Candidates apply karo • Sabka fayda</div>
+    <div class="search-bar">
+      <input class="inp" id="home-search" placeholder="🔍 Job, company ya city..." oninput="renderHomeJobs()">
+      <select class="sel" id="home-cat" onchange="renderHomeJobs()">
+        <option>All</option><option>IT</option><option>Delivery</option><option>Education</option>
+        <option>Manufacturing</option><option>Healthcare</option><option>Sales</option><option>Other</option>
+      </select>
+    </div>
+    <div class="hero-btns">
+      <button class="btn-blue" onclick="showPage('jobs')">Sabhi Jobs Dekho →</button>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="stat-jobs">0</div><div class="stat-label">Active Jobs</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-apps">0</div><div class="stat-label">Applications</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-seats">0</div><div class="stat-label">Total Seats</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-cities">0</div><div class="stat-label">Cities</div></div>
+  </div>
+  <div class="section">
+    <div class="section-title">🔥 Latest Jobs</div>
+    <div class="job-grid" id="home-jobs"><div class="loading"><div class="spinner"></div> Loading...</div></div>
+  </div>
+</div>
+
+<!-- JOBS PAGE -->
+<div id="page-jobs" class="page">
+  <div class="section">
+    <div class="section-title" id="jobs-count-title">💼 Sabhi Jobs</div>
+    <div class="filter-bar">
+      <input class="inp" id="jobs-search" placeholder="🔍 Search..." style="max-width:280px" oninput="renderJobsPage()">
+      <select class="sel" id="jobs-cat" onchange="renderJobsPage()">
+        <option>All</option><option>IT</option><option>Delivery</option><option>Education</option>
+        <option>Manufacturing</option><option>Healthcare</option><option>Sales</option><option>Other</option>
+      </select>
+      <select class="sel" id="jobs-type" onchange="renderJobsPage()">
+        <option>All</option><option>Full Time</option><option>Part Time</option><option>Contract</option>
+      </select>
+    </div>
+    <div class="job-grid" id="jobs-list"><div class="loading"><div class="spinner"></div> Loading...</div></div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="page-admin" class="page">
+  <div class="section" id="admin-login-section" style="max-width:420px">
+    <div class="form-card" style="text-align:center">
+      <div style="font-size:52px;margin-bottom:8px">🔐</div>
+      <div style="font-size:22px;font-weight:800;color:#f1f5f9;margin-bottom:4px">Admin Login</div>
+      <div id="admin-error" class="error-box" style="display:none"></div>
+      <div class="form-group" style="text-align:left"><label class="form-label">Username</label>
+        <input class="full-inp" id="admin-user" placeholder="admin" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+      <div class="form-group" style="text-align:left;margin-bottom:20px"><label class="form-label">Password</label>
+        <input class="full-inp" id="admin-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+      <button class="btn-blue btn-full" onclick="adminLogin()">🔓 Login Karo</button>
+      <div style="color:#475569;font-size:12px;margin-top:14px">admin / admin123</div>
+    </div>
+  </div>
+
+  <div class="section" id="admin-dashboard" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+      <div class="section-title" style="margin-bottom:0">⚙️ Admin Dashboard</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-outline" onclick="forceRefresh()" style="font-size:12px;padding:6px 14px">🔄 Refresh</button>
+        <button class="btn-red" onclick="adminLogout()">🚪 Logout</button>
+      </div>
+    </div>
+    <div class="stats-row" style="padding:0 0 20px">
+      <div class="stat-card"><div class="stat-num" id="a-stat-jobs">0</div><div class="stat-label">Total Jobs</div></div>
+      <div class="stat-card"><div class="stat-num" id="a-stat-apps">0</div><div class="stat-label">Applications</div></div>
+      <div class="stat-card"><div class="stat-num" id="a-stat-active">0</div><div class="stat-label">Jobs with Applicants</div></div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-jobs-btn" onclick="switchAdminTab('jobs')">💼 Jobs</button>
+      <button class="tab-btn" id="tab-apps-btn" onclick="switchAdminTab('apps')">👥 Applicants</button>
+      <button class="tab-btn" id="tab-newjob-btn" onclick="switchAdminTab('newjob')">➕ New Job</button>
+    </div>
+
+    <div id="admin-tab-jobs" class="admin-panel active">
+      <div class="section-title">💼 Sabhi Jobs</div>
+      <div id="admin-jobs-list"></div>
+    </div>
+
+    <div id="admin-tab-apps" class="admin-panel">
+      <div class="section-title">👥 Sabhi Applications</div>
+      <div id="admin-apps-list"></div>
+    </div>
+
+    <!-- NEW JOB WITH CUSTOM FIELDS -->
+    <div id="admin-tab-newjob" class="admin-panel">
+      <div style="max-width:650px">
+        <div class="section-title">➕ Naya Job Post Karo</div>
+        <div class="form-card">
+          <div id="admin-post-success" class="success-box" style="display:none">✅ Job post ho gayi!</div>
+          <div class="form-group"><label class="form-label">Job Title *</label><input class="full-inp" id="apj-title" placeholder="e.g. Delivery Boy"></div>
+          <div class="form-group"><label class="form-label">Company *</label><input class="full-inp" id="apj-company" placeholder="Business naam"></div>
+          <div class="form-group"><label class="form-label">Location *</label><input class="full-inp" id="apj-location" placeholder="City"></div>
+          <div class="form-group"><label class="form-label">Salary</label><input class="full-inp" id="apj-salary" placeholder="₹15,000/month"></div>
+          <div class="form-group"><label class="form-label">Seats</label><input class="full-inp" id="apj-seats" type="number" value="1"></div>
+          <div class="form-row" style="margin-bottom:14px">
+            <div><label class="form-label">Type</label><select class="full-inp" id="apj-type"><option>Full Time</option><option>Part Time</option><option>Contract</option></select></div>
+            <div><label class="form-label">Category</label><select class="full-inp" id="apj-cat"><option>IT</option><option>Delivery</option><option>Education</option><option>Manufacturing</option><option>Healthcare</option><option>Sales</option><option>Other</option></select></div>
+          </div>
+          <div class="form-group"><label class="form-label">Description</label><textarea class="textarea" id="apj-desc" placeholder="Job details..."></textarea></div>
+          
+          <!-- CUSTOM FIELDS SECTION -->
+          <div style="margin-top:20px;margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div style="font-weight:700;color:#f1f5f9;font-size:14px">📋 Application Form Fields</div>
+              <button class="btn-green" onclick="addCustomField()">+ Field Add Karo</button>
+            </div>
+            <div style="color:#64748b;font-size:12px;margin-bottom:12px">Default fields: Naam, Phone, Email hamesha rahenge. Niche extra fields add karo.</div>
+            <div id="custom-fields-list"></div>
+          </div>
+
+          <button class="btn-blue btn-full" onclick="adminPostJob()">🚀 Post Karo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APPLY MODAL -->
+<div class="modal-overlay" id="apply-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div style="font-size:20px;font-weight:800;color:#f1f5f9" id="modal-job-title">Job Title</div>
+        <div style="color:#38bdf8;font-weight:600" id="modal-job-company">Company</div>
+      </div>
+      <button class="modal-close" onclick="closeApplyModal()">✕</button>
+    </div>
+    <div id="modal-job-meta"></div>
+    <div id="modal-job-desc" style="margin-top:12px;color:#94a3b8;font-size:14px;line-height:1.6;background:#0f172a;padding:12px;border-radius:10px;display:none"></div>
+    <div style="border-top:1px solid #334155;margin-top:20px;padding-top:16px">
+      <div id="apply-success-msg" style="display:none;text-align:center;padding:24px">
+        <div style="font-size:48px">🎉</div>
+        <div style="color:#22c55e;font-weight:800;font-size:20px;margin-top:8px">Application Submit Ho Gayi!</div>
+        <div style="color:#64748b;font-size:13px;margin-top:6px">Company aapse jald contact karegi</div>
+      </div>
+      <div id="apply-form-section">
+        <div style="font-weight:700;color:#f1f5f9;margin-bottom:14px">📝 Apply Karo</div>
+        <!-- Default fields -->
+        <div class="form-group"><label class="form-label">Naam *</label><input class="full-inp" id="af-name" placeholder="Poora naam"></div>
+        <div class="form-group"><label class="form-label">Phone *</label><input class="full-inp" id="af-phone" type="tel" placeholder="Mobile number"></div>
+        <div class="form-group"><label class="form-label">Email (Optional)</label><input class="full-inp" id="af-email" type="email" placeholder="Email address"></div>
+        <!-- Dynamic custom fields -->
+        <div id="dynamic-apply-fields"></div>
+        <button class="btn-blue btn-full" onclick="submitApply()">🚀 Apply Karo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW APPLICANTS MODAL -->
+<div class="modal-overlay" id="view-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div style="font-weight:800;font-size:17px;color:#f1f5f9" id="view-modal-title">Applicants</div>
+      <button class="modal-close" onclick="closeViewModal()">✕</button>
+    </div>
+    <div id="view-modal-list"></div>
+  </div>
+</div>
+
+<!-- EDIT JOB MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div style="font-size:18px;font-weight:800;color:#f1f5f9">✏️ Job Edit Karo</div>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="form-group"><label class="form-label">Job Title *</label><input class="full-inp" id="ej-title"></div>
+    <div class="form-group"><label class="form-label">Company *</label><input class="full-inp" id="ej-company"></div>
+    <div class="form-group"><label class="form-label">Location *</label><input class="full-inp" id="ej-location"></div>
+    <div class="form-group"><label class="form-label">Salary</label><input class="full-inp" id="ej-salary"></div>
+    <div class="form-group"><label class="form-label">Seats</label><input class="full-inp" id="ej-seats" type="number"></div>
+    <div class="form-row" style="margin-bottom:14px">
+      <div><label class="form-label">Job Type</label>
+        <select class="full-inp" id="ej-type"><option>Full Time</option><option>Part Time</option><option>Contract</option></select></div>
+      <div><label class="form-label">Category</label>
+        <select class="full-inp" id="ej-cat"><option>IT</option><option>Delivery</option><option>Education</option><option>Manufacturing</option><option>Healthcare</option><option>Sales</option><option>Other</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Description</label><textarea class="textarea" id="ej-desc"></textarea></div>
+
+    <!-- Edit Custom Fields -->
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-weight:700;color:#f1f5f9;font-size:13px">📋 Application Form Fields</div>
+        <button class="btn-green" onclick="addEditCustomField()">+ Add</button>
+      </div>
+      <div id="edit-custom-fields-list"></div>
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn-blue btn-full" style="flex:1" onclick="saveEdit()">💾 Save</button>
+      <button class="btn-gray" style="padding:14px 20px;border-radius:10px;border:none;font-weight:700" onclick="closeEditModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════
+// JSONBIN CONFIG
+// ═══════════════════════════════
+const BIN_ID = '6a1666a3f47d5c455c3b9643';
+const API_KEY = '$2a$10$uWWEDN3KVramvGZg2j/ezOKe0iihQbEthMPBZbfF8YwcV0hJpdouy';
+const BIN_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
+
+let jobs = [];
+let currentJobId = null;
+let editJobId = null;
+
+// ═══════════════════════════════
+// SYNC
+// ═══════════════════════════════
+function setSyncStatus(s) {
+  const el = document.getElementById('sync-status');
+  if (s==='ok'){el.className='sync-ok';el.textContent='🟢 Live';}
+  else if(s==='saving'){el.className='sync-saving';el.textContent='🟡 Saving...';}
+  else{el.className='sync-error';el.textContent='🔴 Offline';}
+}
+
+async function loadData() {
+  try {
+    const res = await fetch(BIN_URL+'/latest',{headers:{'X-Master-Key':API_KEY}});
+    if(!res.ok) throw new Error();
+    const data = await res.json();
+    jobs = (data.record&&data.record.jobs)?data.record.jobs:[];
+    setSyncStatus('ok');
+    saveToLocal();
+    return true;
+  } catch(e) {
+    loadFromLocal();
+    setSyncStatus('offline');
+    return false;
+  }
+}
+
+async function saveData() {
+  setSyncStatus('saving');
+  try {
+    const res = await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify({jobs})});
+    if(!res.ok) throw new Error();
+    setSyncStatus('ok');
+    saveToLocal();
+  } catch(e) {
+    setSyncStatus('offline');
+    saveToLocal();
+  }
+}
+
+function saveToLocal(){try{localStorage.setItem('selfjob_jobs',JSON.stringify(jobs));}catch(e){}}
+function loadFromLocal(){try{const d=localStorage.getItem('selfjob_jobs');jobs=d?JSON.parse(d):[];}catch(e){jobs=[];}}
+
+async function forceRefresh(){
+  showToast('🔄 Refresh...');
+  await loadData();
+  renderStats();renderHomeJobs();renderAdminJobs();renderAdminApps();renderAdminStats();
+  showToast('✅ Done!');
+}
+
+// ═══════════════════════════════
+// UTILS
+// ═══════════════════════════════
+function showToast(msg,color='#22c55e'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.background=color;t.style.display='block';
+  setTimeout(()=>t.style.display='none',3500);
+}
+
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('nav-'+p).classList.add('active');
+  if(p==='home'){renderStats();renderHomeJobs();}
+  if(p==='jobs')renderJobsPage();
+  if(p==='admin')renderAdminJobs();
+}
+
+function jobCardHTML(job,adminMode=false){
+  const typeBadge=job.type==='Full Time'?'badge-green':'badge-yellow';
+  const adminBtns=adminMode?`
+    <div class="admin-actions">
+      <button class="btn-outline" onclick="openViewModal(${job.id});event.stopPropagation()">👁 ${job.applicants.length} Applied</button>
+      <button class="btn-edit" onclick="openEditModal(${job.id});event.stopPropagation()">✏️ Edit</button>
+      <button class="btn-red" onclick="deleteJob(${job.id});event.stopPropagation()">🗑 Delete</button>
+    </div>`:'';
+  const click=adminMode?'':`onclick="openApplyModal(${job.id})"`;
+  return `<div class="job-card" ${click}>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div><div class="job-title">${job.title}</div><div class="job-company">${job.company}</div></div>
+      <span class="badge badge-blue">${job.category}</span>
+    </div>
+    <div class="job-meta">
+      <span class="tag">📍 ${job.location}</span>
+      <span class="tag">💰 ${job.salary||'Negotiable'}</span>
+      <span class="tag">🪑 ${job.seats} seats</span>
+    </div>
+    <div class="job-meta" style="margin-top:8px">
+      <span class="badge ${typeBadge}">${job.type}</span>
+      <span class="badge badge-purple">👥 ${job.applicants.length} applied</span>
+    </div>
+    ${adminBtns}
+  </div>`;
+}
+
+function renderStats(){
+  const allApps=jobs.reduce((a,j)=>a+j.applicants.length,0);
+  document.getElementById('stat-jobs').textContent=jobs.length;
+  document.getElementById('stat-apps').textContent=allApps;
+  document.getElementById('stat-seats').textContent=jobs.reduce((a,j)=>a+j.seats,0);
+  document.getElementById('stat-cities').textContent=new Set(jobs.map(j=>j.location)).size;
+}
+
+function renderHomeJobs(){
+  const q=(document.getElementById('home-search').value||'').toLowerCase();
+  const cat=document.getElementById('home-cat').value;
+  const filtered=jobs.filter(j=>(cat==='All'||j.category===cat)&&(j.title.toLowerCase().includes(q)||j.company.toLowerCase().includes(q)||j.location.toLowerCase().includes(q))).slice(0,6);
+  document.getElementById('home-jobs').innerHTML=filtered.length?filtered.map(j=>jobCardHTML(j)).join(''):'<div style="color:#64748b;text-align:center;padding:40px;grid-column:1/-1">Koi job nahi mili 😕</div>';
+}
+
+function renderJobsPage(){
+  const q=(document.getElementById('jobs-search').value||'').toLowerCase();
+  const cat=document.getElementById('jobs-cat').value;
+  const type=document.getElementById('jobs-type').value;
+  const filtered=jobs.filter(j=>(cat==='All'||j.category===cat)&&(type==='All'||j.type===type)&&(j.title.toLowerCase().includes(q)||j.company.toLowerCase().includes(q)||j.location.toLowerCase().includes(q)));
+  document.getElementById('jobs-count-title').textContent=`💼 Sabhi Jobs (${filtered.length})`;
+  document.getElementById('jobs-list').innerHTML=filtered.length?filtered.map(j=>jobCardHTML(j)).join(''):'<div style="color:#64748b;text-align:center;padding:40px;grid-column:1/-1">Koi job nahi mili 😕</div>';
+}
+
+// ═══════════════════════════════
+// CUSTOM FIELDS
+// ═══════════════════════════════
+const FIELD_TYPES = [
+  {value:'text', label:'Text (Short)'},
+  {value:'textarea', label:'Text (Long)'},
+  {value:'number', label:'Number'},
+  {value:'date', label:'Date'},
+  {value:'tel', label:'Phone'},
+  {value:'email', label:'Email'},
+  {value:'select', label:'Dropdown'},
+];
+
+function fieldTypeOptions(selected='text'){
+  return FIELD_TYPES.map(t=>`<option value="${t.value}" ${selected===t.value?'selected':''}>${t.label}</option>`).join('');
+}
+
+function addCustomField(containerId='custom-fields-list'){
+  const container = document.getElementById(containerId);
+  const idx = Date.now();
+  const div = document.createElement('div');
+  div.className = 'custom-field-row';
+  div.id = 'cf_'+idx;
+  div.innerHTML = `
+    <input placeholder="Field naam (e.g. Date of Birth)" oninput="updateFieldOptions('cf_${idx}')">
+    <select onchange="updateFieldOptions('cf_${idx}')">${fieldTypeOptions()}</select>
+    <input placeholder="Options (comma se alag karo)" id="cf_opts_${idx}" style="display:none">
+    <button onclick="document.getElementById('cf_${idx}').remove()" style="background:#ef444422;color:#ef4444;border:1px solid #ef444444;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:16px">✕</button>
+  `;
+  container.appendChild(div);
+}
+
+function updateFieldOptions(id){
+  const row = document.getElementById(id);
+  if(!row) return;
+  const sel = row.querySelector('select');
+  const opts = row.querySelector('input[placeholder*="Options"]');
+  if(opts) opts.style.display = sel.value==='select' ? 'block' : 'none';
+}
+
+function addEditCustomField(){
+  addCustomField('edit-custom-fields-list');
+}
+
+function getCustomFields(containerId='custom-fields-list'){
+  const fields = [];
+  const rows = document.getElementById(containerId).querySelectorAll('.custom-field-row');
+  rows.forEach(row=>{
+    const inputs = row.querySelectorAll('input');
+    const sel = row.querySelector('select');
+    const name = inputs[0].value.trim();
+    const type = sel ? sel.value : 'text';
+    const opts = inputs[1] ? inputs[1].value.trim() : '';
+    if(name){
+      fields.push({name, type, options: opts ? opts.split(',').map(o=>o.trim()).filter(Boolean) : []});
+    }
+  });
+  return fields;
+}
+
+function renderCustomFieldsInEdit(fields, containerId='edit-custom-fields-list'){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  (fields||[]).forEach(f=>{
+    const idx = Date.now() + Math.random();
+    const id = 'cf_'+Math.floor(idx);
+    const div = document.createElement('div');
+    div.className = 'custom-field-row';
+    div.id = id;
+    div.innerHTML = `
+      <input placeholder="Field naam" value="${f.name}" oninput="updateFieldOptions('${id}')">
+      <select onchange="updateFieldOptions('${id}')">${fieldTypeOptions(f.type)}</select>
+      <input placeholder="Options (comma se)" id="cf_opts_${id}" value="${(f.options||[]).join(', ')}" style="display:${f.type==='select'?'block':'none'}">
+      <button onclick="document.getElementById('${id}').remove()" style="background:#ef444422;color:#ef4444;border:1px solid #ef444444;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:16px">✕</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════
+// APPLY MODAL
+// ═══════════════════════════════
+function openApplyModal(id){
+  currentJobId=id;
+  const job=jobs.find(j=>j.id===id);
+  if(!job)return;
+  document.getElementById('modal-job-title').textContent=job.title;
+  document.getElementById('modal-job-company').textContent=job.company;
+  document.getElementById('modal-job-meta').innerHTML=`
+    <div class="job-meta">
+      <span class="tag">📍 ${job.location}</span>
+      <span class="tag">💰 ${job.salary||'Negotiable'}</span>
+      <span class="tag">🪑 ${job.seats} seats</span>
+    </div>
+    <div class="job-meta" style="margin-top:8px">
+      <span class="badge badge-green">${job.type}</span>
+      <span class="badge badge-blue">${job.category}</span>
+    </div>`;
+  const desc=document.getElementById('modal-job-desc');
+  if(job.description){desc.textContent=job.description;desc.style.display='block';}
+  else desc.style.display='none';
+
+  // Render dynamic custom fields
+  const dynFields = document.getElementById('dynamic-apply-fields');
+  dynFields.innerHTML = '';
+  (job.customFields||[]).forEach(f=>{
+    const div = document.createElement('div');
+    div.className = 'form-group';
+    let inp = '';
+    if(f.type==='textarea'){
+      inp = `<textarea class="textarea" id="dyn_${f.name}" placeholder="${f.name}..."></textarea>`;
+    } else if(f.type==='select' && f.options && f.options.length){
+      inp = `<select class="full-inp" id="dyn_${f.name}"><option value="">-- Select karo --</option>${f.options.map(o=>`<option>${o}</option>`).join('')}</select>`;
+    } else {
+      inp = `<input class="full-inp" id="dyn_${f.name}" type="${f.type}" placeholder="${f.name}">`;
+    }
+    div.innerHTML = `<label class="form-label">${f.name}</label>${inp}`;
+    dynFields.appendChild(div);
+  });
+
+  ['af-name','af-phone','af-email'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('apply-success-msg').style.display='none';
+  document.getElementById('apply-form-section').style.display='block';
+  document.getElementById('apply-modal').classList.add('open');
+}
+function closeApplyModal(){document.getElementById('apply-modal').classList.remove('open');}
+
+async function submitApply(){
+  const name=document.getElementById('af-name').value.trim();
+  const phone=document.getElementById('af-phone').value.trim();
+  if(!name||!phone){showToast('⚠️ Naam aur Phone zaroori hai!','#f59e0b');return;}
+  
+  const app={
+    name, phone,
+    email:document.getElementById('af-email').value.trim(),
+    date:new Date().toLocaleDateString('en-IN'),
+    customData:{}
+  };
+
+  // Collect custom field values
+  const job=jobs.find(j=>j.id===currentJobId);
+  (job.customFields||[]).forEach(f=>{
+    const el=document.getElementById('dyn_'+f.name);
+    if(el) app.customData[f.name]=el.value;
+  });
+
+  const jobIdx=jobs.findIndex(j=>j.id===currentJobId);
+  if(jobIdx===-1)return;
+  jobs[jobIdx]={...jobs[jobIdx],applicants:[...jobs[jobIdx].applicants,app]};
+  await saveData();
+  document.getElementById('apply-form-section').style.display='none';
+  document.getElementById('apply-success-msg').style.display='block';
+  showToast('✅ Application submit ho gayi!');
+  renderStats();
+}
+
+// ═══════════════════════════════
+// ADMIN
+// ═══════════════════════════════
+function adminLogin(){
+  const u=document.getElementById('admin-user').value.trim();
+  const p=document.getElementById('admin-pass').value.trim();
+  const err=document.getElementById('admin-error');
+  if(u==='admin'&&p==='admin123'){
+    document.getElementById('admin-login-section').style.display='none';
+    document.getElementById('admin-dashboard').style.display='block';
+    err.style.display='none';
+    renderAdminStats();renderAdminJobs();renderAdminApps();
+  } else {
+    err.textContent='❌ Galat username ya password';
+    err.style.display='block';
+  }
+}
+
+function adminLogout(){
+  document.getElementById('admin-login-section').style.display='block';
+  document.getElementById('admin-dashboard').style.display='none';
+  document.getElementById('admin-user').value='';
+  document.getElementById('admin-pass').value='';
+}
+
+function switchAdminTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+tab+'-btn').classList.add('active');
+  const m={jobs:'admin-tab-jobs',apps:'admin-tab-apps',newjob:'admin-tab-newjob'};
+  document.getElementById(m[tab]).classList.add('active');
+  if(tab==='jobs')renderAdminJobs();
+  if(tab==='apps')renderAdminApps();
+}
+
+function renderAdminStats(){
+  const allApps=jobs.reduce((a,j)=>a+j.applicants.length,0);
+  document.getElementById('a-stat-jobs').textContent=jobs.length;
+  document.getElementById('a-stat-apps').textContent=allApps;
+  document.getElementById('a-stat-active').textContent=jobs.filter(j=>j.applicants.length>0).length;
+}
+
+function renderAdminJobs(){
+  renderAdminStats();
+  document.getElementById('admin-jobs-list').innerHTML=jobs.length?jobs.map(j=>jobCardHTML(j,true)).join(''):'<div style="color:#64748b;padding:30px;text-align:center">Koi job nahi hai</div>';
+}
+
+function renderAdminApps(){
+  const allApps=jobs.flatMap(j=>j.applicants.map(a=>({...a,jobTitle:j.title,company:j.company})));
+  const el=document.getElementById('admin-apps-list');
+  if(!allApps.length){el.innerHTML='<div style="color:#64748b;padding:30px;text-align:center">Koi application nahi aayi</div>';return;}
+  el.innerHTML=allApps.map((a,i)=>{
+    const customInfo = a.customData ? Object.entries(a.customData).map(([k,v])=>`<div style="color:#94a3b8;font-size:12px">📌 ${k}: ${v}</div>`).join('') : '';
+    return `<div class="admin-row">
+      <div>
+        <div style="font-weight:700;color:#f1f5f9">${a.name}</div>
+        <div style="color:#38bdf8;font-size:12px">${a.jobTitle} @ ${a.company}</div>
+        <div style="color:#64748b;font-size:12px">📞 ${a.phone}${a.email?' • 📧 '+a.email:''}</div>
+        ${customInfo}
+      </div>
+      <div style="color:#475569;font-size:11px">${a.date}</div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteJob(id){
+  if(!confirm('Job delete karna chahte ho?'))return;
+  jobs=jobs.filter(j=>j.id!==id);
+  await saveData();
+  renderAdminJobs();
+  showToast('✅ Job delete ho gayi');
+}
+
+async function adminPostJob(){
+  const title=document.getElementById('apj-title').value.trim();
+  const company=document.getElementById('apj-company').value.trim();
+  const location=document.getElementById('apj-location').value.trim();
+  if(!title||!company||!location){showToast('⚠️ Title, Company aur Location zaroori hai!','#f59e0b');return;}
+  
+  const customFields = getCustomFields('custom-fields-list');
+  
+  const job={
+    id:Date.now(),title,company,location,
+    salary:document.getElementById('apj-salary').value.trim(),
+    seats:parseInt(document.getElementById('apj-seats').value)||1,
+    type:document.getElementById('apj-type').value,
+    category:document.getElementById('apj-cat').value,
+    description:document.getElementById('apj-desc').value.trim(),
+    posted:new Date().toLocaleDateString('en-IN'),
+    applicants:[],
+    customFields
+  };
+  jobs.unshift(job);
+  await saveData();
+  ['apj-title','apj-company','apj-location','apj-salary','apj-desc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('apj-seats').value='1';
+  document.getElementById('custom-fields-list').innerHTML='';
+  const s=document.getElementById('admin-post-success');
+  s.style.display='block';setTimeout(()=>s.style.display='none',4000);
+  showToast('✅ Job post ho gayi!');
+  renderAdminStats();renderAdminJobs();renderStats();
+}
+
+// ═══════════════════════════════
+// VIEW APPLICANTS
+// ═══════════════════════════════
+function openViewModal(id){
+  const job=jobs.find(j=>j.id===id);
+  document.getElementById('view-modal-title').textContent='👥 '+job.title;
+  const list=document.getElementById('view-modal-list');
+  if(!job.applicants.length){
+    list.innerHTML='<div style="color:#64748b;text-align:center;padding:30px">Koi application nahi aayi</div>';
+  } else {
+    list.innerHTML=job.applicants.map((a,i)=>{
+      const customInfo = a.customData ? Object.entries(a.customData).map(([k,v])=>`<div style="color:#94a3b8;font-size:12px">📌 ${k}: ${v}</div>`).join('') : '';
+      return `<div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:12px 16px;margin-bottom:10px">
+        <div style="font-weight:700;color:#f1f5f9">${i+1}. ${a.name}</div>
+        <div style="color:#64748b;font-size:13px">📞 ${a.phone}${a.email?' • 📧 '+a.email:''}</div>
+        ${customInfo}
+        <div style="color:#475569;font-size:11px;margin-top:4px">${a.date}</div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('view-modal').classList.add('open');
+}
+function closeViewModal(){document.getElementById('view-modal').classList.remove('open');}
+
+// ═══════════════════════════════
+// EDIT JOB
+// ═══════════════════════════════
+function openEditModal(id){
+  const job=jobs.find(j=>j.id===id);
+  if(!job)return;
+  editJobId=id;
+  document.getElementById('ej-title').value=job.title;
+  document.getElementById('ej-company').value=job.company;
+  document.getElementById('ej-location').value=job.location;
+  document.getElementById('ej-salary').value=job.salary||'';
+  document.getElementById('ej-seats').value=job.seats;
+  document.getElementById('ej-type').value=job.type;
+  document.getElementById('ej-cat').value=job.category;
+  document.getElementById('ej-desc').value=job.description||'';
+  renderCustomFieldsInEdit(job.customFields||[], 'edit-custom-fields-list');
+  document.getElementById('edit-modal').classList.add('open');
+}
+function closeEditModal(){document.getElementById('edit-modal').classList.remove('open');editJobId=null;}
+
+async function saveEdit(){
+  const title=document.getElementById('ej-title').value.trim();
+  const company=document.getElementById('ej-company').value.trim();
+  const location=document.getElementById('ej-location').value.trim();
+  if(!title||!company||!location){showToast('⚠️ Zaroori fields bharo!','#f59e0b');return;}
+  const jobIdx=jobs.findIndex(j=>j.id===editJobId);
+  if(jobIdx===-1)return;
+  const customFields=getCustomFields('edit-custom-fields-list');
+  jobs[jobIdx]={...jobs[jobIdx],title,company,location,
+    salary:document.getElementById('ej-salary').value.trim(),
+    seats:parseInt(document.getElementById('ej-seats').value)||1,
+    type:document.getElementById('ej-type').value,
+    category:document.getElementById('ej-cat').value,
+    description:document.getElementById('ej-desc').value.trim(),
+    customFields
+  };
+  await saveData();
+  closeEditModal();
+  renderAdminJobs();
+  showToast('✅ Job update ho gayi!');
+}
+
+document.getElementById('apply-modal').addEventListener('click',function(e){if(e.target===this)closeApplyModal();});
+document.getElementById('view-modal').addEventListener('click',function(e){if(e.target===this)closeViewModal();});
+document.getElementById('edit-modal').addEventListener('click',function(e){if(e.target===this)closeEditModal();});
+
+setInterval(async()=>{
+  await loadData();
+  const ap=document.querySelector('.page.active');
+  if(ap&&ap.id==='page-home'){renderStats();renderHomeJobs();}
+  if(ap&&ap.id==='page-jobs')renderJobsPage();
+},30000);
+
+async function init(){
+  setSyncStatus('saving');
+  await loadData();
+  renderStats();
+  renderHomeJobs();
+}
+init();
+</script>
+</body>
+</html>
