@@ -207,6 +207,10 @@
             <div><label class="form-label">Category</label><select class="full-inp" id="apj-cat"><option>IT</option><option>Delivery</option><option>Education</option><option>Manufacturing</option><option>Healthcare</option><option>Sales</option><option>Other</option></select></div>
           </div>
           <div class="form-group"><label class="form-label">Description</label><textarea class="textarea" id="apj-desc" placeholder="Job details..."></textarea></div>
+          <div class="form-row" style="margin-bottom:14px">
+            <div><label class="form-label">📅 Interview Date</label><input class="full-inp" id="apj-interview-date" type="date"></div>
+            <div><label class="form-label">📍 Interview Place</label><input class="full-inp" id="apj-interview-place" placeholder="e.g. Office, Zoom"></div>
+          </div>
           
           <!-- CUSTOM FIELDS SECTION -->
           <div style="margin-top:20px;margin-bottom:14px">
@@ -287,6 +291,10 @@
         <select class="full-inp" id="ej-cat"><option>IT</option><option>Delivery</option><option>Education</option><option>Manufacturing</option><option>Healthcare</option><option>Sales</option><option>Other</option></select></div>
     </div>
     <div class="form-group"><label class="form-label">Description</label><textarea class="textarea" id="ej-desc"></textarea></div>
+    <div class="form-row" style="margin-bottom:14px">
+      <div><label class="form-label">📅 Interview Date</label><input class="full-inp" id="ej-interview-date" type="date"></div>
+      <div><label class="form-label">📍 Interview Place</label><input class="full-inp" id="ej-interview-place" placeholder="e.g. Office, Zoom"></div>
+    </div>
 
     <!-- Edit Custom Fields -->
     <div style="margin-bottom:14px">
@@ -304,6 +312,17 @@
   </div>
 </div>
 
+
+<!-- APPLICANT DETAIL MODAL -->
+<div class="modal-overlay" id="applicant-detail-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div style="font-weight:800;font-size:17px;color:#f1f5f9">👤 Applicant Details</div>
+      <button class="modal-close" onclick="closeApplicantDetail()">✕</button>
+    </div>
+    <div id="applicant-detail-content"></div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -405,6 +424,7 @@ function jobCardHTML(job,adminMode=false){
       <span class="tag">💰 ${job.salary||'Negotiable'}</span>
       <span class="tag">🪑 ${job.seats} seats</span>
     </div>
+    ${job.interviewDate?`<div class="job-meta" style="margin-top:6px"><span class="tag">📅 Interview: ${job.interviewDate}</span>${job.interviewPlace?` <span class="tag">📍 ${job.interviewPlace}</span>`:''}</div>`:''}
     <div class="job-meta" style="margin-top:8px">
       <span class="badge ${typeBadge}">${job.type}</span>
       <span class="badge badge-purple">👥 ${job.applicants.length} applied</span>
@@ -531,6 +551,7 @@ function openApplyModal(id){
       <span class="tag">💰 ${job.salary||'Negotiable'}</span>
       <span class="tag">🪑 ${job.seats} seats</span>
     </div>
+    ${job.interviewDate?`<div class="job-meta" style="margin-top:6px"><span class="tag">📅 Interview: ${job.interviewDate}</span>${job.interviewPlace?` <span class="tag">📍 ${job.interviewPlace}</span>`:''}</div>`:''}
     <div class="job-meta" style="margin-top:8px">
       <span class="badge badge-green">${job.type}</span>
       <span class="badge badge-blue">${job.category}</span>
@@ -681,13 +702,16 @@ async function adminPostJob(){
     type:document.getElementById('apj-type').value,
     category:document.getElementById('apj-cat').value,
     description:document.getElementById('apj-desc').value.trim(),
+    interviewDate:document.getElementById('apj-interview-date').value,
+    interviewPlace:document.getElementById('apj-interview-place').value.trim(),
     posted:new Date().toLocaleDateString('en-IN'),
     applicants:[],
     customFields
   };
   jobs.unshift(job);
   await saveData();
-  ['apj-title','apj-company','apj-location','apj-salary','apj-desc'].forEach(id=>document.getElementById(id).value='');
+  ['apj-title','apj-company','apj-location','apj-salary','apj-desc','apj-interview-place'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('apj-interview-date').value='';
   document.getElementById('apj-seats').value='1';
   document.getElementById('custom-fields-list').innerHTML='';
   const s=document.getElementById('admin-post-success');
@@ -707,11 +731,12 @@ function openViewModal(id){
     list.innerHTML='<div style="color:#64748b;text-align:center;padding:30px">Koi application nahi aayi</div>';
   } else {
     list.innerHTML=job.applicants.map((a,i)=>{
-      const customInfo = a.customData ? Object.entries(a.customData).map(([k,v])=>`<div style="color:#94a3b8;font-size:12px">📌 ${k}: ${v}</div>`).join('') : '';
-      return `<div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:12px 16px;margin-bottom:10px">
-        <div style="font-weight:700;color:#f1f5f9">${i+1}. ${a.name}</div>
-        <div style="color:#64748b;font-size:13px">📞 ${a.phone}${a.email?' • 📧 '+a.email:''}</div>
-        ${customInfo}
+      return `<div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:12px 16px;margin-bottom:10px;cursor:pointer" onclick="openApplicantDetail(${JSON.stringify(a).replace(/"/g,'&quot;')})">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:700;color:#f1f5f9">${i+1}. ${a.name}</div>
+          <span style="color:#38bdf8;font-size:12px">Tap for details →</span>
+        </div>
+        <div style="color:#64748b;font-size:12px">📞 ${a.phone}</div>
         <div style="color:#475569;font-size:11px;margin-top:4px">${a.date}</div>
       </div>`;
     }).join('');
@@ -719,6 +744,36 @@ function openViewModal(id){
   document.getElementById('view-modal').classList.add('open');
 }
 function closeViewModal(){document.getElementById('view-modal').classList.remove('open');}
+
+function openApplicantDetail(a){
+  const customInfo = a.customData ? Object.entries(a.customData).map(([k,v])=>`
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;margin-bottom:8px">
+      <div style="color:#64748b;font-size:11px;font-weight:600;text-transform:uppercase">${k}</div>
+      <div style="color:#f1f5f9;font-size:14px;margin-top:4px">${v||'-'}</div>
+    </div>`).join('') : '';
+  
+  document.getElementById('applicant-detail-content').innerHTML = `
+    <div style="background:#0f172a;border-radius:12px;padding:16px;margin-bottom:12px">
+      <div style="font-size:20px;font-weight:800;color:#f1f5f9;margin-bottom:4px">${a.name}</div>
+      <div style="color:#475569;font-size:12px">${a.date}</div>
+    </div>
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;margin-bottom:8px">
+      <div style="color:#64748b;font-size:11px;font-weight:600">PHONE</div>
+      <div style="color:#f1f5f9;font-size:14px;margin-top:4px">📞 ${a.phone}</div>
+    </div>
+    ${a.email?`<div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;margin-bottom:8px">
+      <div style="color:#64748b;font-size:11px;font-weight:600">EMAIL</div>
+      <div style="color:#f1f5f9;font-size:14px;margin-top:4px">📧 ${a.email}</div>
+    </div>`:''}
+    ${customInfo}
+  `;
+  document.getElementById('view-modal').classList.remove('open');
+  document.getElementById('applicant-detail-modal').classList.add('open');
+}
+
+function closeApplicantDetail(){
+  document.getElementById('applicant-detail-modal').classList.remove('open');
+}
 
 // ═══════════════════════════════
 // EDIT JOB
@@ -735,6 +790,8 @@ function openEditModal(id){
   document.getElementById('ej-type').value=job.type;
   document.getElementById('ej-cat').value=job.category;
   document.getElementById('ej-desc').value=job.description||'';
+  document.getElementById('ej-interview-date').value=job.interviewDate||'';
+  document.getElementById('ej-interview-place').value=job.interviewPlace||'';
   renderCustomFieldsInEdit(job.customFields||[], 'edit-custom-fields-list');
   document.getElementById('edit-modal').classList.add('open');
 }
@@ -754,6 +811,8 @@ async function saveEdit(){
     type:document.getElementById('ej-type').value,
     category:document.getElementById('ej-cat').value,
     description:document.getElementById('ej-desc').value.trim(),
+    interviewDate:document.getElementById('ej-interview-date').value,
+    interviewPlace:document.getElementById('ej-interview-place').value.trim(),
     customFields
   };
   await saveData();
@@ -765,6 +824,7 @@ async function saveEdit(){
 document.getElementById('apply-modal').addEventListener('click',function(e){if(e.target===this)closeApplyModal();});
 document.getElementById('view-modal').addEventListener('click',function(e){if(e.target===this)closeViewModal();});
 document.getElementById('edit-modal').addEventListener('click',function(e){if(e.target===this)closeEditModal();});
+document.getElementById('applicant-detail-modal').addEventListener('click',function(e){if(e.target===this)closeApplicantDetail();});
 
 setInterval(async()=>{
   await loadData();
